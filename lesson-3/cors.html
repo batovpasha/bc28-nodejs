@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>CORS example</title>
+  </head>
+
+  <body>
+    <script>
+      fetch('http://localhost:3000/')
+        .then(res => res.text())
+        .then(data => console.log(data))
+        .catch(err => console.error(err));
+    </script>
+  </body>
+</html>
