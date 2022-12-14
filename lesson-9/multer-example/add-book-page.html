@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Add Book Page</title>
+  </head>
+
+  <body>
+    <form id="book-add-form" enctype="multipart/form-data">
+      <input type="text" name="title" placeholder="Book Title" required /><br>
+      <input type="text" name="author" placeholder="Book Author" required /><br>
+      <input type="file" name="cover" required multiple /><br>
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      const bookAddForm = document.getElementById("book-add-form");
+
+      bookAddForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const {title, author, cover} = this.elements;
+        const data = new FormData();
+
+        data.append("title", title.value)
+        data.append("author", author.value)
+        data.append("cover", cover.files[0])
+
+        await fetch('http://localhost:3000/api/books', {
+          method: 'POST',
+          body: data,
+        }).then(() => console.log('Book was successfully added!'))
+          .catch((err) => console.error(err));
+      });
+    </script>
+  </body>
+</html>
