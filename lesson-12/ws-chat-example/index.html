@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Простий чат</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div>
+        <form action="" id="user-name-form">
+            <label for="">Ваше ім'я</label>
+            <input type="text" name="userName" placeholder="Ваше ім'я" required />
+        </form>
+    </div>
+    <div id="chat" class="chat">
+    </div>
+
+    <div id="chat-message">
+        <form action="" id="chat-form">
+            <div class="form-group">
+                <textarea name="message" id="" cols="30" rows="3" placeholder="Нове повідомлення" required></textarea>
+            </div>
+            <button type="submit">Відправити</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js" integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh" crossorigin="anonymous"></script>
+    <script>
+        // 1. Ввести ім'я юзера і зберегти його для відправки з його повідомленнями
+        let userName = "";
+
+        const userNameForm = document.getElementById("user-name-form");
+
+        userNameForm.addEventListener("submit", function(e){
+            e.preventDefault();
+
+            userName = this.elements.userName.value;
+
+            this.remove();
+        });
+        // -1.
+
+        // 2. Підписатись на нові меседжі від інших користувачів
+        const socket = io.connect('http://localhost:3000')
+        // const ws = new WebSocket("http://localhost:3000");
+
+        socket.on('chat-message', data => {
+            const {name, message} = data;
+
+            chat.insertAdjacentHTML("beforeend", `
+            <p>
+             <span class="name">${name}:</span>
+             <span class="user-chat-message">${message}</span>
+            </p>`);
+        });
+        // -2.
+
+        // ws.onmessage = ({data}) => {
+        //     const {name, message} = JSON.parse(data);
+
+        //     chat.insertAdjacentHTML("beforeend", `
+        //     <p>
+        //      <span class="name">${name}:</span>
+        //      <span class="user-chat-message">${message}</span>
+        //     </p>`);
+        // }
+
+        // 3. Взяти збережене ім'я юзера, його меседж і відправити на сервер
+        const chat = document.getElementById("chat");
+        const chatForm = document.getElementById("chat-form");
+
+        chatForm.addEventListener("submit", function(e){
+            e.preventDefault();
+
+            const message = this.elements.message.value;
+
+            chat.insertAdjacentHTML("beforeend", `
+            <p>
+             <span class="name">${userName}:</span>
+             <span class="you-chat-message">${message}</span>
+            </p>`);
+
+            const data = {
+                name: userName,
+                message
+            };
+
+            // ws.send(JSON.stringify(data));
+            socket.emit('chat-message', data);
+
+            this.reset();
+        })
+        // -3.
+    </script>
+</body>
+
+</html>
